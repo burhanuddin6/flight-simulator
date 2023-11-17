@@ -41,48 +41,32 @@ let light1, light2;
 let terrains = [];
 let landScape;
 let program;
-
+let QUIT = false;
 let angle = 0.0;
 let trackingMouse = false;
 
 let lastX = screen.width / 2, lastY = screen.height / 2
 let firstMouse = true
 
+// all the rotations can be only from -90 to 90
 let yaw = 0.0;
-let pitch = -30.0;
+let pitch = 0.0;
+let roll = 0.0;
 
-let terrainHorMin = -1, terrainHorMax = 1;
-let terrainVertMin = -1, terrainVertMax = 1;
-
-function trackballView(x, y) {
-    let d, a;
-    let v = [];
-
-    v[0] = x;
-    v[1] = y;
-
-    d = v[0] * v[0] + v[1] * v[1];
-
-    if (d < 1.0) {
-        v[2] = Math.sqrt(1.0 - d);
-    }
-    else {
-        v[2] = 0.0;
-        a = 1.0 / Math.sqrt(d);
-        v[0] *= a;
-        v[1] *= a;
-    }
-
-    return v;
+function getFront(pitch, yaw, roll) {
+    return vec3(
+        Math.cos(radians(yaw)) * Math.cos(radians(pitch)),
+        Math.sin(radians(pitch)),
+        Math.sin(radians(yaw)) * Math.cos(radians(pitch))
+    );
 }
 
-function startMotion() {
-    trackingMouse = true;
-}
-
-function stopMotion() {
-    trackingMouse = false;
-    camera.reset();
+function getUp(pitch, yaw, roll) {
+    return vec3(
+        Math.sin(radians(pitch)) * Math.cos(radians(yaw)) + Math.cos(radians(pitch)) * Math.sin(radians(roll)) * Math.sin(radians(yaw)),
+        1,
+        Math.cos(radians(pitch)) * Math.sin(radians(roll)) + Math.sin(radians(pitch)) * Math.sin(radians(yaw)) * Math.cos(radians(roll))
+    );
 }
 
 function init() {
@@ -120,53 +104,61 @@ function init() {
     light2.intensity.diffuse = vec3(0.9, 0.6, 0.3);
     light2.intensity.specular = vec3(0.5, 0.75, 1.0);
 
-    // range 0 - 20
-    // let grids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    // for (let i = 0; i < grids.length; i++) {
-    //     for (let j = 0; j < grids.length; j++) {
-    //         let terrain = new Terrain(program, grids[i], grids[j], 100, 1000.0);
-    //         terrain.init();
-    //         terrains.push(terrain);
-        
-    //     }
-    // }
     landScape = new LandScape(program);
     landScape.getPatch(-6000, 6000, -5000, 5000);
 
-    let front = vec3(
-        Math.cos(radians(yaw)) * Math.cos(radians(pitch)),
-        Math.sin(radians(pitch)),
-        Math.sin(radians(yaw)) * Math.cos(radians(pitch))
-    )
-    console.log(front)
-    console.log()
-    camera.front = normalize(front)
+    camera.front = normalize(getFront(pitch, yaw, roll));
+    camera.up = normalize(getUp(pitch, yaw, roll));
 
     window.onkeydown = function (event) {
-        if (!trackingMouse) {
-            let key = String.fromCharCode(event.keyCode)
+        let key = String.fromCharCode(event.keyCode);
+        switch (key) {
+            case '5': // forward
+                camera.position = add(camera.position, scale(camera.SPEED, camera.front));
+                break;
+            case '1': // left
+                camera.position = subtract(camera.position, scale(camera.SPEED, normalize(cross(camera.front, camera.up))));
+                break;
+            case '6': // backward
+                camera.position = subtract(camera.position, scale(camera.SPEED, camera.front));
+                break;
+            case '2': // right
+                camera.position = add(camera.position, scale(camera.SPEED, normalize(cross(camera.front, camera.up))));
+                break;
+            case '3': // up
+                camera.position = add(camera.position, scale(camera.SPEED, camera.up));
+                break;
+            case '4': // down
+                camera.position = subtract(camera.position, scale(camera.SPEED, camera.up));
+                break;
+            // quit the program
+            case '': // quit
+                QUIT = true;
+                break;
+            case 'W': // pitch up
+                pitch = Math.min(pitch + 1, 90);
+                break;
+            case 'S': // pitch down
+                pitch = Math.max(pitch - 1, -90);
+                break;
+            case 'A': // yaw left
+                yaw = Math.max(yaw - 1, -90);
+                break;
+            case 'D': // yaw right  
+                yaw = Math.min(yaw + 1, 90);
+                break;
+            case 'Q': // roll left
+                roll  = Math.min(roll - 1, 90);
+                break;
+            case 'E': // roll right
+                roll = Math.max(roll + 1, -90);
+                break;
+            default:
+                break;
 
-            switch (key) {
-                case 'W':
-                    camera.position = add(camera.position, scale(camera.SPEED, camera.front));
-                    break;
-                case 'A':
-                    camera.position = subtract(camera.position, scale(camera.SPEED, normalize(cross(camera.front, camera.up))));
-                    break;
-                case 'S':
-                    camera.position = subtract(camera.position, scale(camera.SPEED, camera.front));
-                    break;
-                case 'D':
-                    camera.position = add(camera.position, scale(camera.SPEED, normalize(cross(camera.front, camera.up))));
-                    break;
-                case 'E':
-                    camera.position = add(camera.position, scale(camera.SPEED, camera.up));
-                    break;
-                case 'Q':
-                    camera.position = subtract(camera.position, scale(camera.SPEED, camera.up));
-                    break;
-            }
         }
+        camera.front = normalize(getFront(pitch, yaw, roll));
+        camera.up = normalize(getUp(pitch, yaw, roll));
     }
 
     canvas.addEventListener("mousedown", function (event) {
@@ -181,18 +173,14 @@ function init() {
 }
 
 function render() {
+    if (QUIT) {
+        return;
+    }
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     light1.render();
     light2.render();
-    // terrains.forEach(terrain => {
-    //     console.log(camera.position)       
-    //     return terrain.render()
-    // });
-    // copy values of camer po
-    
     if (prevCamPos[0] != camera.position[0] || prevCamPos[2] != camera.position[2]) {
-        // calculate xmin, xmax, zmin, zmax based on yaw. The terrain is always in front of the camera
-        // let xmin, xmax, zmin, zmax;
+        // TODO: calculate xmin, xmax, zmin, zmax based on yaw. The terrain is always in front of the camera
         renderCount++;
         prevCamPos = camera.position.slice(0);
     }
