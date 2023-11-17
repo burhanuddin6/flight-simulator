@@ -1,5 +1,5 @@
 class Terrain extends _3DObject {
-    MAX_HEIGHT = 800;
+    MAX_HEIGHT = 1000;
 
     constructor(program, gridX, gridZ, vertexCount, size) {
         super(program, vec3(gridX * size, 0, gridZ * size));

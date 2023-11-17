@@ -44,7 +44,7 @@ let program;
 let QUIT = false;
 let angle = 0.0;
 let trackingMouse = false;
-
+let speedFactor = 1;
 let lastX = screen.width / 2, lastY = screen.height / 2
 let firstMouse = true
 
@@ -114,7 +114,7 @@ function init() {
         let key = String.fromCharCode(event.keyCode);
         switch (key) {
             case '5': // forward
-                camera.position = add(camera.position, scale(camera.SPEED, camera.front));
+                speedFactor = 5;
                 break;
             case '1': // left
                 camera.position = subtract(camera.position, scale(camera.SPEED, normalize(cross(camera.front, camera.up))));
@@ -154,6 +154,7 @@ function init() {
                 roll = Math.max(roll + 1, -90);
                 break;
             default:
+                speedFactor = 1;
                 break;
 
         }
@@ -177,6 +178,9 @@ function render() {
         return;
     }
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    camera.position = add(camera.position, scale(camera.SPEED*speedFactor, camera.front));
+    camera.position[1] = Math.max(camera.position[1], 300);
+    camera.position[1] = Math.min(camera.position[1], 2000);
     light1.render();
     light2.render();
     if (prevCamPos[0] != camera.position[0] || prevCamPos[2] != camera.position[2]) {
@@ -185,10 +189,11 @@ function render() {
         prevCamPos = camera.position.slice(0);
     }
     if (renderCount > 100) {
-        landScape.getPatch(camera.position[0], camera.position[0] + 6000, camera.position[2] - 3000, camera.position[2] + 3000);
+        landScape.getPatch(camera.position[0], camera.position[0] + 10000*speedFactor, camera.position[2] - 3000, camera.position[2] + 3000);
         renderCount = 0;
         console.log("render")
     }
+    speedFactor = 1;
     landScape.render();
     camera.render(trackingMouse);
     requestAnimFrame(render);
