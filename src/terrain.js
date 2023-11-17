@@ -57,6 +57,7 @@ class Terrain extends _3DObject {
             }
         };
 
+
         let generateIndices = function (vertexCount) {
             for (let z = 0; z < vertexCount - 1; z++)
                 for (let x = 0; x < vertexCount - 1; x++) {

@@ -1,5 +1,5 @@
 const URL = `${window.location.protocol}//${window.location.host}`
-const fShaderSrcFile = `${URL}/fshader.glsl`
+const fShaderSrcFile = `${URL}/fshader4.glsl`
 const vShaderSrcFile = `${URL}/vshader.glsl`
 
 const  vertexShaderSource = await (await fetch(vShaderSrcFile)).text()
@@ -47,6 +47,7 @@ let trackingMouse = false;
 let speedFactor = 1;
 let lastX = screen.width / 2, lastY = screen.height / 2
 let firstMouse = true
+let shadingMode = 0;
 
 // all the rotations can be only from -90 to 90
 let yaw = 0.0;
@@ -152,6 +153,11 @@ function init() {
                 break;
             case 'E': // roll right
                 roll = Math.max(roll + 1, -90);
+                break;
+            case 'G':
+                shadingMode = (shadingMode + 1) % 3;
+                landScape.shadingMode = shadingMode;
+                console.log(shadingMode);
                 break;
             default:
                 speedFactor = 1;

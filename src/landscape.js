@@ -3,8 +3,8 @@ class LandScape {
     constructor(program) {
         this.terrains = [];
         this.terrainSize = 1500;
-        this.terrainVertexCount = 50;
-        this.shadingShceme = 0;
+        this.terrainVertexCount = 70;
+        this.shadingMode = 2;
         this.program = program;
     }
 
@@ -26,6 +26,9 @@ class LandScape {
     }
 
     render() {
+        const shadingModeUniform = gl.getUniformLocation(this.program, "shadingMode");
+        // Set the shading mode uniform in the shader
+        gl.uniform1i(shadingModeUniform, this.shadingMode);
         for (let i = 0; i < this.terrains.length; i++) {
             this.terrains[i].render();
         }
