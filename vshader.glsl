@@ -44,4 +44,5 @@ void main()
     f_TexCoord = v_TexCoord;
     f_vertexHeight = v_Pos.y;
     gl_Position = m_Proj * tmp_Pos;
+    gl_PointSize = 5.0;
 }

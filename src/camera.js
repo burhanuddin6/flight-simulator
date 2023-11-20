@@ -11,6 +11,8 @@ class Camera {
         this.initUp = up;
         this.front = vec3(0.0, 0.0, -1.0);
         this.initFront = this.front;
+        this.far = 10000;
+        this.initFar = this.far;
     }
 
     render() {
@@ -23,7 +25,7 @@ class Camera {
         gl.uniformMatrix4fv(view, false, flatten(matView));
 
         var proj = gl.getUniformLocation(this.program, "m_Proj");
-        var matProj = perspective(60.0, 1.0, 1.0, 10000);
+        var matProj = perspective(60.0, 1.0, 1.0, this.far);
         gl.uniformMatrix4fv(proj, false, flatten(matProj));
     }
 

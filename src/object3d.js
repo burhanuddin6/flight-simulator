@@ -38,6 +38,7 @@ class _3DObject {
         this.textureCoords = [];
         this.position = position;
         this.matModel = mat4();
+        this.primitiveType = "LINES";
     }
 
     loadData() {
@@ -86,15 +87,16 @@ class _3DObject {
         gl.vertexAttribPointer(texCoord, 2, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(texCoord);
         
-
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIndex);
-        gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
-        // else if (option == 1) {
-        //     gl.drawArrays(gl.LINE_STRIP, 0, this.vertices.length);
-        // }
-        // else if (option == 2) {
-        //     gl.drawArrays(gl.POINTS, 0, this.vertices.length);
-        // }
+        if (this.primitiveType == "TRIANGLES"){
+            gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+        }
+        else if (this.primitiveType == "POINTS"){
+            gl.drawElements(gl.POINTS, this.indices.length, gl.UNSIGNED_SHORT, 0);
+        }
+        else if (this.primitiveType == "LINES"){
+            gl.drawElements(gl.LINES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+        }
     }
 
     translate(dir) {

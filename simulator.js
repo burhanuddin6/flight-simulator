@@ -1,5 +1,5 @@
 const URL = `${window.location.protocol}//${window.location.host}`
-const fShaderSrcFile = `${URL}/fshader4.glsl`
+const fShaderSrcFile = `${URL}/fshader5.glsl`
 const vShaderSrcFile = `${URL}/vshader.glsl`
 
 const  vertexShaderSource = await (await fetch(vShaderSrcFile)).text()
@@ -48,6 +48,7 @@ let speedFactor = 1;
 let lastX = screen.width / 2, lastY = screen.height / 2
 let firstMouse = true
 let shadingMode = 0;
+let viewMode = 0;
 
 // all the rotations can be only from -90 to 90
 let yaw = 0.0;
@@ -107,6 +108,7 @@ function init() {
 
     landScape = new LandScape(program);
     landScape.getPatch(-6000, 6000, -5000, 5000);
+    landScape.shadingMode = shadingMode;
 
     camera.front = normalize(getFront(pitch, yaw, roll));
     camera.up = normalize(getUp(pitch, yaw, roll));
@@ -114,14 +116,18 @@ function init() {
     window.onkeydown = function (event) {
         let key = String.fromCharCode(event.keyCode);
         switch (key) {
-            case '5': // forward
+            case ' ': // near
                 speedFactor = 5;
                 break;
             case '1': // left
                 camera.position = subtract(camera.position, scale(camera.SPEED, normalize(cross(camera.front, camera.up))));
                 break;
-            case '6': // backward
-                camera.position = subtract(camera.position, scale(camera.SPEED, camera.front));
+            case '5': // near
+                camera.far = Math.max(camera.far - 100, 1500);
+                break;
+            case '6': // far
+                // camera.position = subtract(camera.position, scale(camera.SPEED, camera.front));
+                camera.far = Math.min(camera.far + 100, 15000);
                 break;
             case '2': // right
                 camera.position = add(camera.position, scale(camera.SPEED, normalize(cross(camera.front, camera.up))));
@@ -154,10 +160,13 @@ function init() {
             case 'E': // roll right
                 roll = Math.max(roll + 1, -90);
                 break;
-            case 'G':
+            case 'C':
                 shadingMode = (shadingMode + 1) % 3;
                 landScape.shadingMode = shadingMode;
-                console.log(shadingMode);
+                break;
+            case 'V':
+                viewMode = (viewMode + 1) % 3;
+                landScape.primitiveType = viewMode == 0 ? "TRIANGLES" : (viewMode == 1 ? "LINES" : "POINTS");
                 break;
             default:
                 speedFactor = 1;
@@ -195,9 +204,17 @@ function render() {
         prevCamPos = camera.position.slice(0);
     }
     if (renderCount > 100) {
-        landScape.getPatch(camera.position[0], camera.position[0] + 10000*speedFactor, camera.position[2] - 3000, camera.position[2] + 3000);
+        if (yaw > -30 && yaw < 30) {
+            landScape.getPatch(camera.position[0] + 5000*speedFactor, camera.position[0] + 10000*speedFactor, camera.position[2] - 5000, camera.position[2] + 5000);
+        }
+        else if (yaw > 30) {
+            landScape.getPatch(camera.position[0] - 5000, camera.position[0] + 5000, camera.position[2] + 5000*speedFactor, camera.position[2] + 10000*speedFactor);
+        }
+        else if (yaw < -30) {
+            landScape.getPatch(camera.position[0] - 5000, camera.position[0] + 5000, camera.position[2] - 10000*speedFactor, camera.position[2] - 5000*speedFactor);
+        }
         renderCount = 0;
-        console.log("render")
+        console.log("render");
     }
     speedFactor = 1;
     landScape.render();

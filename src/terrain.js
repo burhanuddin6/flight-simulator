@@ -1,5 +1,5 @@
 class Terrain extends _3DObject {
-    MAX_HEIGHT = 1000;
+    MAX_HEIGHT = 2000;
 
     constructor(program, gridX, gridZ, vertexCount, size) {
         super(program, vec3(gridX * size, 0, gridZ * size));
@@ -7,7 +7,6 @@ class Terrain extends _3DObject {
         this.gridZ = gridZ;
         this.vertexCount = vertexCount;
         this.size = size;
-
         this.material = {
             ambient: vec3(0.2, 0.3, 0.4),
             diffuse: vec3(0.3, 0.6, 0.5),
@@ -66,12 +65,24 @@ class Terrain extends _3DObject {
                     let bottomLeft = ((z + 1) * vertexCount) + x;
                     let bottomRight = bottomLeft + 1;
 
-                    self.indices.push(topLeft);
-                    self.indices.push(bottomLeft);
-                    self.indices.push(topRight);
-                    self.indices.push(topRight);
-                    self.indices.push(bottomLeft);
-                    self.indices.push(bottomRight);
+                    if (self.primitiveType === "TRIANGLES"){
+                        self.indices.push(topLeft);
+                        self.indices.push(bottomLeft);
+                        self.indices.push(topRight);
+                        self.indices.push(topRight);
+                        self.indices.push(bottomLeft);
+                        self.indices.push(bottomRight);
+                    }
+                    else if (self.primitiveType === "POINTS"){
+                        self.indices.push(topLeft);
+                    }
+                    else if (self.primitiveType == "LINES"){
+                        self.indices.push(topLeft);
+                        self.indices.push(bottomLeft);
+                        self.indices.push(topLeft);
+                        self.indices.push(topRight);
+
+                    }
                 }
         };
 

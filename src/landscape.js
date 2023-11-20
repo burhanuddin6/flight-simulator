@@ -3,9 +3,10 @@ class LandScape {
     constructor(program) {
         this.terrains = [];
         this.terrainSize = 1500;
-        this.terrainVertexCount = 70;
+        this.terrainVertexCount = 50;
         this.shadingMode = 2;
         this.program = program;
+        this.primitiveType = "TRIANGLES";
     }
 
     getPatch(xmin, xmax, zmin, zmax){
@@ -18,6 +19,7 @@ class LandScape {
         for (let i = gridX; i <= gridXMax; i++) {
             for (let j = gridZ; j <= gridZMax; j++) {
                 let terrain = new Terrain(this.program, i, j, this.terrainVertexCount, this.terrainSize);
+                terrain.primitiveType = this.primitiveType;
                 terrain.init();
                 patch.push(terrain);
             }
