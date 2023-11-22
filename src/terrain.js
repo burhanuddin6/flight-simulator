@@ -9,9 +9,9 @@ class Terrain extends _3DObject {
         this.size = size;
         this.material = {
             ambient: vec3(0.2, 0.3, 0.4),
-            diffuse: vec3(0.3, 0.6, 0.5),
-            specular: vec3(0.9, 1.0, 0.9),
-            shininess: 30.0
+            diffuse: vec3(0.2, 0.3, 0.25),
+            specular: vec3(0.3, 0.4, 0.3),
+            shininess: 10.0
         }
     }
 

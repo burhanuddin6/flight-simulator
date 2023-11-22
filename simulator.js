@@ -1,5 +1,5 @@
 const URL = `${window.location.protocol}//${window.location.host}`
-const fShaderSrcFile = `${URL}/fshader5.glsl`
+const fShaderSrcFile = `${URL}/fshader.glsl`
 const vShaderSrcFile = `${URL}/vshader.glsl`
 
 const  vertexShaderSource = await (await fetch(vShaderSrcFile)).text()
@@ -83,7 +83,7 @@ function init() {
     if (!gl) { alert("WebGL isn't available"); }
 
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    gl.clearColor(0.53, 0.81, 0.98, 1.0);
 
     gl.enable(gl.DEPTH_TEST);
 
@@ -127,7 +127,7 @@ function init() {
                 break;
             case '6': // far
                 // camera.position = subtract(camera.position, scale(camera.SPEED, camera.front));
-                camera.far = Math.min(camera.far + 100, 15000);
+                camera.far = Math.min(camera.far + 100, 20000);
                 break;
             case '2': // right
                 camera.position = add(camera.position, scale(camera.SPEED, normalize(cross(camera.front, camera.up))));
@@ -177,13 +177,6 @@ function init() {
         camera.up = normalize(getUp(pitch, yaw, roll));
     }
 
-    canvas.addEventListener("mousedown", function (event) {
-        startMotion();
-    });
-
-    canvas.addEventListener("mouseup", function (event) {
-        stopMotion();
-    });
 
     render();
 }
@@ -205,13 +198,13 @@ function render() {
     }
     if (renderCount > 100) {
         if (yaw > -30 && yaw < 30) {
-            landScape.getPatch(camera.position[0] + 5000*speedFactor, camera.position[0] + 10000*speedFactor, camera.position[2] - 5000, camera.position[2] + 5000);
+            landScape.getPatch(camera.position[0] - 5000, camera.position[0] + 10000*speedFactor, camera.position[2] - 5000, camera.position[2] + 5000*speedFactor);
         }
         else if (yaw > 30) {
-            landScape.getPatch(camera.position[0] - 5000, camera.position[0] + 5000, camera.position[2] + 5000*speedFactor, camera.position[2] + 10000*speedFactor);
+            landScape.getPatch(camera.position[0] - 10000, camera.position[0] + 10000, camera.position[2] - 5000, camera.position[2] + 10000*speedFactor);
         }
         else if (yaw < -30) {
-            landScape.getPatch(camera.position[0] - 5000, camera.position[0] + 5000, camera.position[2] - 10000*speedFactor, camera.position[2] - 5000*speedFactor);
+            landScape.getPatch(camera.position[0] - 10000, camera.position[0] + 10000, camera.position[2] - 10000*speedFactor, camera.position[2] + 5000);
         }
         renderCount = 0;
         console.log("render");

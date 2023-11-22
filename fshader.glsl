@@ -12,41 +12,9 @@ uniform vec3 light_Ambient0, light_Diffuse0, light_Specular0;
 uniform vec3 light_Ambient1, light_Diffuse1, light_Specular1;
 
 uniform float MAX_HEIGHT;
+uniform int shadingMode;  // 0: Flat, 1: Smooth (Gouraud), 2: Phong
 
 out vec4 FragColor;
-
-vec4 biomeDiff(float height) {
-    float scaledHeight = height / MAX_HEIGHT;
-    vec4 grassColor = vec4(0.2, 0.8, 0.2, 1.0);
-    vec4 snowColor = vec4(1.0, 1.0, 1.0, 1.0);
-    vec4 rockColor = vec4(0.541, 0.4, 0.22, 1.0);
-    vec4 sandColor = vec4(0.9, 0.8, 0.6, 1.0);
-    vec4 beachColor = vec4(0.8, 0.6, 0.4, 1.0);
-    vec4 forestColor = vec4(0.0, 0.5, 0.0, 1.0);
-    vec4 waterColor = vec4(0.0, 0.0, 1.0, 1.0);
-
-    if (scaledHeight < 0.04) {
-        return waterColor;
-    }
-
-    if (scaledHeight < 0.15) {
-        return grassColor;
-    }
-
-    if (scaledHeight < 0.2) {
-        return mix(grassColor, rockColor, 0.7);
-    }
-
-    if (scaledHeight < 0.3) {
-        return rockColor;
-    }
-
-    if (scaledHeight < 0.4) {
-        return mix(rockColor, snowColor, 0.7);
-    }
-
-    return snowColor;
-}
 
 vec4 biomeSpec(float height) {
     float scaledHeight = height / MAX_HEIGHT;
@@ -81,6 +49,75 @@ vec4 biomeSpec(float height) {
     return snowColor;
 }
 
+vec4 biomeDiff(float height) {
+    float scaledHeight = height / MAX_HEIGHT;
+    vec4 grassColor = vec4(0.2, 0.8, 0.2, 1.0);
+    vec4 snowColor = vec4(1.0, 1.0, 1.0, 1.0);
+    vec4 rockColor = vec4(0.541, 0.4, 0.22, 1.0);
+    vec4 sandColor = vec4(0.9, 0.8, 0.6, 1.0);
+    vec4 beachColor = vec4(0.8, 0.6, 0.4, 1.0);
+    vec4 forestColor = vec4(0.0, 0.5, 0.0, 1.0);
+    vec4 waterColor = vec4(0.0, 0.0, 1.0, 1.0);
+
+    if (scaledHeight < 0.04) {
+        return waterColor;
+    }
+
+    if (scaledHeight < 0.15) {
+        return grassColor;
+    }
+
+    if (scaledHeight < 0.2) {
+        return mix(grassColor, rockColor, 0.7);
+    }
+
+    if (scaledHeight < 0.3) {
+        return rockColor;
+    }
+
+    if (scaledHeight < 0.4) {
+        return mix(rockColor, snowColor, 0.7);
+    }
+
+    return snowColor;
+}
+
+vec4 biomeDiffSmooth(float height) {
+    float scaledHeight = height / MAX_HEIGHT;
+    vec4 grassColor = vec4(0.2, 0.8, 0.2, 1.0);
+    vec4 snowColor = vec4(0.9, 0.9, 0.9, 1.0);
+    vec4 rockColor = vec4(0.541, 0.4, 0.22, 1.0);
+    vec4 sandColor = vec4(0.9, 0.8, 0.6, 1.0);
+    vec4 beachColor = vec4(0.8, 0.6, 0.4, 1.0);
+    vec4 forestColor = vec4(0.0, 0.5, 0.0, 1.0);
+    vec4 waterColor = vec4(0.0, 0.0, 1.0, 1.0);
+
+    float factor;
+    if (scaledHeight < 0.04) {
+        factor = scaledHeight / 0.04;
+        return mix(waterColor, grassColor, factor);
+    }
+
+    if (scaledHeight < 0.15) {
+        factor = (scaledHeight - 0.04) / (0.15 - 0.04);
+        return mix(grassColor, sandColor, factor);
+    }
+
+    if (scaledHeight < 0.2) {
+        factor = (scaledHeight - 0.15) / (0.2 - 0.15);
+        return mix(sandColor, rockColor, factor);
+    }
+
+    if (scaledHeight < 0.3) {
+        factor = (scaledHeight - 0.2) / (0.4 - 0.2);
+        return mix(rockColor, snowColor, factor);
+    }
+
+    vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
+    factor = (scaledHeight - 0.4) / (1.0 - 0.4);
+    return mix(snowColor, white, factor);
+}
+
 void main()
 {   
     vec3 N = normalize(o_Norm);
@@ -112,16 +149,31 @@ void main()
 
     vec3 specular0 = ks0 * texelColorSpec.rgb * light_Specular0;
     vec3 specular1 = ks1 * texelColorSpec.rgb * light_Specular1;
+    // Calculate final color based on shading mode
+    if (shadingMode == 0) { // Flat shading
+        // generates some lighting based on height
+        vec3 color = biomeDiff(f_vertexHeight).xyz;
+        FragColor.xyz = color;
+        FragColor.a = 1.0;
+        return;
+    }
+    else if (shadingMode == 1){
+        vec4 smooth_color = biomeDiffSmooth(f_vertexHeight);
+        FragColor = smooth_color;
+        FragColor.a = 1.0;
+        return;
+    } else {
+        texelColorDiff = biomeDiffSmooth(f_vertexHeight);
+        if (dot(L0, N) < 0.0) 
+            specular0 = vec3(0.0, 0.0, 0.0);
+            
+        if (dot(L1, N) < 0.0) 
+            specular1 = vec3(0.0, 0.0, 0.0);
 
-    if (dot(L0, N) < 0.0) 
-        specular0 = vec3(0.0, 0.0, 0.0);
-        
-    if (dot(L1, N) < 0.0) 
-        specular1 = vec3(0.0, 0.0, 0.0);
-
-    FragColor.xyz = ambient0 + diffuse0 + specular0 + ambient1 + diffuse1 + specular1;
-    float temp = gl_FragCoord.z + 0.1 * f_vertexHeight / MAX_HEIGHT +0.25;
-    // FragColor.xyz = mix(vec3(1.0, 1.0, 1.0), vec3(0.1, 0.1, 0.1), temp);
-    // FragColor.xyz = texelColorDiff.xyz;
-    FragColor.a = texelColorDiff.a;
+        FragColor.xyz = ambient0 + diffuse0 + specular0 + ambient1 + diffuse1 + specular1;
+        float temp = gl_FragCoord.z + 0.1 * f_vertexHeight / MAX_HEIGHT +0.25;
+        // FragColor.xyz = mix(vec3(1.0, 1.0, 1.0), vec3(0.1, 0.1, 0.1), temp);
+        // FragColor.xyz = texelColorDiff.xyz;
+        FragColor.a = texelColorDiff.a;
+    }
 }

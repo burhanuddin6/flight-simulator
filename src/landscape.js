@@ -28,6 +28,10 @@ class LandScape {
     }
 
     render() {
+        if (this.terrains.length > 150) {
+            let remove = this.terrains.length - 100;
+            this.terrains = this.terrains.slice(remove, this.terrains.length);
+        }
         const shadingModeUniform = gl.getUniformLocation(this.program, "shadingMode");
         // Set the shading mode uniform in the shader
         gl.uniform1i(shadingModeUniform, this.shadingMode);
