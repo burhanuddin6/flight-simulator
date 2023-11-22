@@ -116,9 +116,6 @@ function init() {
     window.onkeydown = function (event) {
         let key = String.fromCharCode(event.keyCode);
         switch (key) {
-            case ' ': // near
-                speedFactor = 5;
-                break;
             case '1': // left
                 camera.position = subtract(camera.position, scale(camera.SPEED, normalize(cross(camera.front, camera.up))));
                 break;
@@ -173,6 +170,12 @@ function init() {
                 break;
 
         }
+        if (event.key === "ArrowUp") {
+            speedFactor = 5;
+        }
+        else if (event.key === "ArrowDown") {
+            speedFactor = Math.max(speedFactor - 1, 0);
+        }
         camera.front = normalize(getFront(pitch, yaw, roll));
         camera.up = normalize(getUp(pitch, yaw, roll));
     }
@@ -198,13 +201,13 @@ function render() {
     }
     if (renderCount > 100) {
         if (yaw > -30 && yaw < 30) {
-            landScape.getPatch(camera.position[0] - 5000, camera.position[0] + 10000*speedFactor, camera.position[2] - 5000, camera.position[2] + 5000*speedFactor);
+            landScape.getPatch(camera.position[0] - 5000, camera.position[0] + 10000*Math.max(speedFactor, 1), camera.position[2] - 5000, camera.position[2] + 5000*Math.max(speedFactor, 1));
         }
         else if (yaw > 30) {
-            landScape.getPatch(camera.position[0] - 10000, camera.position[0] + 10000, camera.position[2] - 5000, camera.position[2] + 10000*speedFactor);
+            landScape.getPatch(camera.position[0] - 10000, camera.position[0] + 10000, camera.position[2] - 5000, camera.position[2] + 10000*Math.max(speedFactor, 1));
         }
         else if (yaw < -30) {
-            landScape.getPatch(camera.position[0] - 10000, camera.position[0] + 10000, camera.position[2] - 10000*speedFactor, camera.position[2] + 5000);
+            landScape.getPatch(camera.position[0] - 10000, camera.position[0] + 10000, camera.position[2] - 10000*Math.max(speedFactor, 1), camera.position[2] + 5000);
         }
         renderCount = 0;
         console.log("render");

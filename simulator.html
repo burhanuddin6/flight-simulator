@@ -3,6 +3,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            font-size: 12px;
             margin: 20px;
             display: flex;
         }
@@ -13,7 +14,7 @@
             flex: 1; /* 25% of the container width */
         }
         #info p {
-            margin: 5px 0;
+            margin: 3px 0;
         }
         #canvas-container {
             flex: 3; /* 75% of the container width */
@@ -21,7 +22,7 @@
         }
         canvas {
             width: 100%; /* Make the canvas take up the full width of its container */
-            height: 100vh; /* Set canvas height to full viewport height */
+            height: 90vh; /* Set canvas height to full viewport height */
         }
     </style>
 </head>
@@ -40,13 +41,14 @@
         </p>
         
         <p><strong>Esc:</strong> Quit the program</p>
-        <p><strong>Space:</strong> Increase speed</p>
+        <p><strong>Arrow Up:</strong> Increase Speed (do not press for long or it will hang)</p>
+        <p><strong>Arrow Down:</strong> Decrease Speed (stay still)</p>
         <p><strong>1:</strong> Move left</p>
         <p><strong>2:</strong> Move right</p>
         <p><strong>3:</strong> Move up</p>
         <p><strong>4:</strong> Move down</p>
         <p><strong>5:</strong> Decrease camera far plane</p>
-        <p><strong>6:</strong> Increase camera far plane</p>
+        <p><strong>6:</strong> Increase camera far plane. Its not clearly apparent (unless you press 5 first) because the initial value is close</p>
         <p><strong>W:</strong> Pitch up</p>
         <p><strong>S:</strong> Pitch down</p>
         <p><strong>A:</strong> Yaw left</p>
@@ -58,7 +60,7 @@
         <p><em>Any other key:</em> Reset speed factor</p>
     </div>
     <div id="canvas-container">
-        <canvas id="gl-canvas" width="1000" height="730">
+        <canvas id="gl-canvas" width="900" height="600">
             Oops ... your browser doesn't support the HTML5 canvas element
         </canvas>
     </div>
