@@ -123,11 +123,11 @@ function init() {
                 camera.position = subtract(camera.position, scale(camera.SPEED, normalize(cross(camera.front, camera.up))));
                 break;
             case '5': // near
-                camera.far = Math.max(camera.far - 100, 1500);
+                camera.far = Math.max(camera.far - 100, 3000);
                 break;
             case '6': // far
                 // camera.position = subtract(camera.position, scale(camera.SPEED, camera.front));
-                camera.far = Math.min(camera.far + 100, 20000);
+                camera.far = Math.min(camera.far + 100, 60000);
                 break;
             case '2': // right
                 camera.position = add(camera.position, scale(camera.SPEED, normalize(cross(camera.front, camera.up))));
@@ -188,7 +188,7 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     camera.position = add(camera.position, scale(camera.SPEED*speedFactor, camera.front));
     camera.position[1] = Math.max(camera.position[1], 300);
-    camera.position[1] = Math.min(camera.position[1], 2000);
+    camera.position[1] = Math.min(camera.position[1], 5000);
     light1.render();
     light2.render();
     if (prevCamPos[0] != camera.position[0] || prevCamPos[2] != camera.position[2]) {

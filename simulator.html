@@ -1,16 +1,67 @@
 <!DOCTYPE html>
-
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;
+        }
+        #info-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            max-width: 400px;
+            flex: 1; /* 25% of the container width */
+        }
+        #info p {
+            margin: 5px 0;
+        }
+        #canvas-container {
+            flex: 3; /* 75% of the container width */
+            margin-left: 20px; /* Add some spacing between info and canvas */
+        }
+        canvas {
+            width: 100%; /* Make the canvas take up the full width of its container */
+            height: 100vh; /* Set canvas height to full viewport height */
+        }
+    </style>
+</head>
 <body>
-    <canvas id="gl-canvas" width="1000" height="730">
-        Oops ... your browser doesn't support the HTML5 canvas element
-    </canvas>
-    <p>
-        Please manually change the shadingMode variable in simulator.js to change the shading mode.
-        From 0: Flat, 1: Smooth, 2: Phong
-    </p>
-    <p>
-        The key is not working in the simulator for 'C'
-    </p>
+    <div id="info-container">
+        <h1>Curved Flight Simulator</h1>
+        <h3>
+            The curvature is intentionally introduced because we thought it would be more fun (realistic?) to fly.
+        </h3>
+        <p>
+            The simulator is slow because we are generating new randomized terrain every frame.
+        </p>
+        <p>
+            <em>Controls:</em>
+            Please note that if a control is not working, you may need to click on the canvas first.
+        </p>
+        
+        <p><strong>Esc:</strong> Quit the program</p>
+        <p><strong>Space:</strong> Increase speed</p>
+        <p><strong>1:</strong> Move left</p>
+        <p><strong>2:</strong> Move right</p>
+        <p><strong>3:</strong> Move up</p>
+        <p><strong>4:</strong> Move down</p>
+        <p><strong>5:</strong> Decrease camera far plane</p>
+        <p><strong>6:</strong> Increase camera far plane</p>
+        <p><strong>W:</strong> Pitch up</p>
+        <p><strong>S:</strong> Pitch down</p>
+        <p><strong>A:</strong> Yaw left</p>
+        <p><strong>D:</strong> Yaw right</p>
+        <p><strong>Q:</strong> Roll left</p>
+        <p><strong>E:</strong> Roll right</p>
+        <p><strong>C:</strong> Toggle shading mode</p>
+        <p><strong>V:</strong> Toggle view mode</p>
+        <p><em>Any other key:</em> Reset speed factor</p>
+    </div>
+    <div id="canvas-container">
+        <canvas id="gl-canvas" width="1000" height="730">
+            Oops ... your browser doesn't support the HTML5 canvas element
+        </canvas>
+    </div>
 </body>
 
 <script type="text/javascript" src="./Common/webgl-utils.js"></script>

@@ -44,5 +44,9 @@ void main()
     f_TexCoord = v_TexCoord;
     f_vertexHeight = v_Pos.y;
     gl_Position = m_Proj * tmp_Pos;
+    float curvature = 0.00003; // Adjust based on the desired curvature
+    vec4 position = vec4(gl_Position);
+    position.y += curvature * (0.0 - (abs(position.x))) * (abs(position.x));
+    gl_Position = position;
     gl_PointSize = 5.0;
 }
